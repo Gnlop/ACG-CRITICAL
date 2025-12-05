@@ -1,4 +1,5 @@
 
+
 import { Language } from './types';
 
 export const SYSTEM_INSTRUCTION = `
@@ -43,6 +44,11 @@ export const SYSTEM_INSTRUCTION = `
 * **O: 0.15** (原创)
 * **U: 0.10** (一致)
 * **R: 0.05** (残响)
+
+### B.7 指数计算标准 (Indices Calculation)
+* **S (Raw Weighted Score)**: Sum of (Score_i * Weight_i). Range: 0.0-5.0.
+* **S_adj (Adjusted Score)**: Calculate as S * 20. Range: 0.0-100.0.
+* **Constraints**: S_adj 必须输出为 0-100 的数值。禁止输出 0-5 的原始分。例如：若加权分为 4.35，则 S_adj = 87.00。
 
 ### B.8 自适应贝叶斯-跟风过滤算法 (ABBF)
 **目标**：在融合分数时，准确区分“质量差”与“题材敏感/跟风黑”。
@@ -158,6 +164,8 @@ export const UI_TRANSLATIONS = {
     medium_manga: "漫画",
     medium_vn: "视觉小说",
     medium_novel: "小说",
+    export_image: "导出结论图片",
+    exporting: "正在生成图片...",
   },
   en: {
     app_title: "X-Critical",
@@ -212,6 +220,8 @@ export const UI_TRANSLATIONS = {
     medium_manga: "Manga",
     medium_vn: "Visual Novel",
     medium_novel: "Novel",
+    export_image: "Export Result Card",
+    exporting: "Generating Image...",
   },
   ja: {
     app_title: "極限選別",
@@ -266,6 +276,8 @@ export const UI_TRANSLATIONS = {
     medium_manga: "マンガ",
     medium_vn: "ビジュアルノベル",
     medium_novel: "小説",
+    export_image: "画像を保存",
+    exporting: "画像生成中...",
   }
 };
 
@@ -283,11 +295,11 @@ export const MANIFESTO_CONTENT = {
       },
       {
         header: "3. ABBF 算法 (The ABBF Engine)",
-        body: "Adaptive Bayesian-Bandwagon Filtering (自适应贝叶斯-跟风过滤) 是本系统的核心风控模块。它用于解决‘叫好不叫座’或‘跟风黑’的问题。\n\n• 共识置信度 (Consensus Reliability): 若网络评分两极分化（1分与10分互刷），系统将大幅降低网络权重 ($\\\\omega < 0.3$)，回归本地AI判断。\n• 题材税 (Taboo Tax): 若作品涉及伦理/暴力等敏感题材导致网络低分，而AI分析其内核深刻，系统将启动‘抗压模式’，强制忽略网络上的道德审判。"
+        body: "Adaptive Bayesian-Bandwagon Filtering (自适应贝叶斯-跟风过滤) 是本系统的核心风控模块。它用于解决‘叫好不叫座’或‘跟风黑’的问题。\n\n• 共识置信度 (Consensus Reliability): 若网络评分两极分化（1分与10分互刷），系统将大幅降低网络权重 ($\\omega < 0.3$)，回归本地AI判断。\n• 题材税 (Taboo Tax): 若作品涉及伦理/暴力等敏感题材导致网络低分，而AI分析其内核深刻，系统将启动‘抗压模式’，强制忽略网络上的道德审判。"
       },
       {
         header: "4. 混合架构 (Hybrid Architecture)",
-        body: "• 阶段一 (Local): 使用 Gemini 3 Pro 的内建知识库进行纯净评审，不受外界舆论干扰。\n• 阶段二 (Hybrid): 联网检索实时数据，通过 ABBF 算法计算融合系数 ($\\\\omega$)，生成最终的修正分数。"
+        body: "• 阶段一 (Local): 使用 Gemini 3 Pro 的内建知识库进行纯净评审，不受外界舆论干扰。\n• 阶段二 (Hybrid): 联网检索实时数据，通过 ABBF 算法计算融合系数 ($\\omega$)，生成最终的修正分数。"
       }
     ]
   },
@@ -304,11 +316,11 @@ export const MANIFESTO_CONTENT = {
       },
       {
         header: "3. The ABBF Engine",
-        body: "Adaptive Bayesian-Bandwagon Filtering is our risk control module. It handles 'review bombing' and 'controversial masterpieces'.\n\n• Consensus Reliability: If online reviews are polarizing (1s vs 10s), the system distrusts the web ($\\\\omega < 0.3$) and relies on local AI.\n• Taboo Tax: If a work is downvoted due to sensitive themes (taboo, violence) but possesses high artistic merit, the system activates 'Resilience Mode', ignoring moralistic review bombing."
+        body: "Adaptive Bayesian-Bandwagon Filtering is our risk control module. It handles 'review bombing' and 'controversial masterpieces'.\n\n• Consensus Reliability: If online reviews are polarizing (1s vs 10s), the system distrusts the web ($\\omega < 0.3$) and relies on local AI.\n• Taboo Tax: If a work is downvoted due to sensitive themes (taboo, violence) but possesses high artistic merit, the system activates 'Resilience Mode', ignoring moralistic review bombing."
       },
       {
         header: "4. Hybrid Architecture",
-        body: "• Stage 1 (Local): Pure analysis using Gemini 3 Pro's internal knowledge, isolated from public opinion.\n• Stage 2 (Hybrid): Real-time web calibration. The system calculates a blending coefficient ($\\\\omega$) via ABBF to produce the final score."
+        body: "• Stage 1 (Local): Pure analysis using Gemini 3 Pro's internal knowledge, isolated from public opinion.\n• Stage 2 (Hybrid): Real-time web calibration. The system calculates a blending coefficient ($\\omega$) via ABBF to produce the final score."
       }
     ]
   },
@@ -325,11 +337,11 @@ export const MANIFESTO_CONTENT = {
       },
       {
         header: "3. ABBF アルゴリズム (The ABBF Engine)",
-        body: "Adaptive Bayesian-Bandwagon Filtering（適応型ベイズ・バンドワゴンフィルタリング）は、本システムの核心です。\n\n• 合意信頼度: ネット上の評価が二極化（1点と10点の応酬）している場合、システムはネット情報を軽視し($\\\\omega < 0.3$)、AIのローカル判断を優先します。\n• タブー税: 過激なテーマ（倫理、暴力）によりネット評価が不当に低い場合、システムは「耐性モード」を発動し、道徳的批判による減点を無効化します。"
+        body: "Adaptive Bayesian-Bandwagon Filtering（適応型ベイズ・バンドワゴンフィルタリング）は、本システムの核心です。\n\n• 合意信頼度: ネット上の評価が二極化（1点と10点の応酬）している場合、システムはネット情報を軽視し($\\omega < 0.3$)、AIのローカル判断を優先します。\n• タブー税: 過激なテーマ（倫理、暴力）によりネット評価が不当に低い場合、システムは「耐性モード」を発動し、道徳的批判による減点を無効化します。"
       },
       {
         header: "4. ハイブリッド構造",
-        body: "• フェーズ1 (Local): Gemini 3 Proの内部知識のみを使用した純粋な審査。\n• フェーズ2 (Hybrid): リアルタイム検索による補正。ABBFを用いて融合係数($\\\\omega$)を計算し、最終スコアを算出します。"
+        body: "• フェーズ1 (Local): Gemini 3 Proの内部知識のみを使用した純粋な審査。\n• フェーズ2 (Hybrid): リアルタイム検索による補正。ABBFを用いて融合係数($\\omega$)を計算し、最終スコアを算出します。"
       }
     ]
   }
