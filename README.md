@@ -1,20 +1,74 @@
+X-Critical: The Extreme Media Screener
+Rigorous, Anti-Inflationary AI Media Analysis powered by Gemini 3 Pro & ABBF Algorithm
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="1200" height="475" alt="X-Critical Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1aeP_3AwuxSLZ50LN4lU3J3oWht95j3rJ
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+📖 Introduction
+X-Critical is a specialized AI evaluation system designed to combat "score inflation" and "mediocrity" in media reviews (Anime, Manga, Visual Novels, Novels). Unlike traditional review aggregators that average user scores, X-Critical employs a strict, philosophy-driven algorithm to filter for masterpieces that achieve extremity in either Logos (Reason) or Pathos (Emotion).
+It utilizes a Hybrid Architecture combining Gemini 3 Pro's internal knowledge base with real-time Google Search grounding, orchestrated by the custom ABBF (Adaptive Bayesian-Bandwagon Filtering) algorithm to detect and mitigate review bombing or controversial bias.
+🧠 Core Philosophy & Logic
+The system rejects the "Jack-of-all-trades" approach. A work with no flaws but no soul is rejected (OUT). A work with significant flaws but a transcendent core is accepted (IN).
+1. The 6-Dimensional Metric (0.0 - 5.0)
+E (Logos/Reason): Logical consistency, philosophical depth, thematic complexity.
+A (Pathos/Emotion): Character arcs, emotional resonance, catharsis.
+C (Techne/Craft): Narrative structure, pacing, audiovisual execution.
+O (Originality): Novelty, boundary-pushing concepts, unique twists.
+U (Unity): Pacing consistency, narrative closure, lack of plot holes.
+R (Resonance): Post-completion impact, re-watch value, "brain rot" factor.
+2. The ABBF Algorithm (Adaptive Bayesian-Bandwagon Filtering)
+This is the core risk-control engine designed to handle polarized masterpieces (e.g., Yosuga no Sora, Mushoku Tensei) which often suffer from moralistic review bombing.
+Logic Flow:
+Consensus Check: The system analyzes the distribution of online search results.
+High Consensus: Trust the wisdom of the crowd (
+).
+Polarized: Distrust the crowd (
+), rely on local AI judgment.
+Taboo Tax Detection: If a work scores high in Local Analysis (E/A > 4.5) but low Online, and contains sensitive themes (Taboo, Gore, Politics), the system flags it as "Review Bombing".
+Dynamic Weighting:
+Objective Metrics (C/U): Heavily weighted towards Online consensus (masses rarely lie about animation quality).
+Subjective Metrics (E/A/R): Heavily weighted towards Local AI (masses often fail to understand nuance in controversial works).
+🛠️ Prompt Design & Engineering
+The prompt architecture is split into two distinct stages to ensure data purity.
+Stage 1: Local Analysis (Isolation Mode)
+Goal: Extract the model's "unbiased" internal knowledge without noise from the internet.
+Technique: tools: [] (No tools allowed).
+Prompt Key: "Assume your internal knowledge is absolute truth. Ignore public opinion."
+Stage 2: Hybrid Analysis (Calibration Mode)
+Goal: Calibrate scores against reality and apply ABBF.
+Technique: tools: [{ googleSearch: {} }].
+Prompt Key:
+"Analyze the DISTRIBUTION of opinions, not just the average."
+"Detect 'Moral Panic' or 'Review Bombing'."
+"Calculate blending coefficient Omega."
+Data Control: The prompt explicitly forces the model to output a JSON structure containing source_analysis metadata to visualize why it made a decision (e.g., "Taboo Tax Detected: 80%").
+💻 Tech Stack
+Frontend: React 19, TypeScript, Tailwind CSS, Lucide React, Recharts.
+AI Backend: Google Gemini API (Gemini 3 Pro Preview).
+Build Tool: Vite.
+🚀 Running Locally
+Prerequisites: Node.js 18+
+Clone the repository
+code
+Bash
+git clone https://github.com/yourusername/x-critical.git
+cd x-critical
+Install dependencies
+code
+Bash
+npm install
+Configure API Key
+Create a .env file in the root directory and add your Google Gemini API key:
+code
+Env
+API_KEY=your_gemini_api_key_here
+Run the app
+code
+Bash
+npm run dev
+⚖️ Disclaimer
+Subjectivity: This tool uses AI to simulate critical analysis. While rigorous, it is ultimately an emulation of subjective critique.
+Hallucinations: Like all LLMs, Gemini may occasionally hallucinate plot details or studio information, especially for obscure works.
+Scoring: The scores are algorithmically generated estimates and should not be taken as absolute objective truth.
+<div align="center">
+<sub>Built with ❤️ by [Your Name] using Google Gemini API</sub>
+</div>
