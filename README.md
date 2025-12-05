@@ -140,5 +140,5 @@ The prompt architecture is split into two distinct stages to ensure data purity.
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by [Your Name] using Google Gemini API</sub>
+  <sub>Built with ❤️ by Gnlop using Google Gemini API</sub>
 </div>
