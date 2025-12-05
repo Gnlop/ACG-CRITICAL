@@ -12,7 +12,7 @@
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/Model-Gemini_2.0_Pro-4E79A7?style=flat-square&logo=google-gemini&logoColor=white" alt="Gemini 2.0 Pro">
+    <img src="https://img.shields.io/badge/Model-Gemini_3.0_Pro-4E79A7?style=flat-square&logo=google-gemini&logoColor=white" alt="Gemini 2.0 Pro">
     <img src="https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19">
     <img src="https://img.shields.io/badge/Style-Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
     <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
