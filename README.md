@@ -29,6 +29,14 @@ Unlike traditional review aggregators that average user scores, X-Critical emplo
 
 It utilizes a **Hybrid Architecture** combining Gemini 3.0 Pro's internal knowledge base with real-time Google Search grounding, orchestrated by the custom **ABBF (Adaptive Bayesian-Bandwagon Filtering)** algorithm to detect and mitigate review bombing or controversial bias.
 
+<br/>
+<div align="center">
+  <h3>📊 Analysis Demo</h3>
+  <img src="https://github.com/Gnlop/ACG-CRITICAL/raw/main/X-Critical-Nukitashi_the_Animation.jpg" alt="X-Critical Interface Demo" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);" />
+  <p><em>Figure 1: Real-time analysis of "Nukitashi the Animation" showcasing the 6-Dimensional Metric.</em></p>
+</div>
+<br/>
+
 ---
 
 ## 🧠 Core Philosophy & Logic
