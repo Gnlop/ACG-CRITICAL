@@ -8,7 +8,7 @@
   </p>
   
   <p>
-    <strong>Rigorous, Anti-Inflationary AI Media Analysis powered by Gemini 2.0 Pro & ABBF Algorithm</strong>
+    <strong>Rigorous, Anti-Inflationary AI Media Analysis powered by Gemini 3.0 Pro & ABBF Algorithm</strong>
   </p>
 
   <p>
@@ -27,7 +27,7 @@
 
 Unlike traditional review aggregators that average user scores, X-Critical employs a strict, philosophy-driven algorithm to filter for masterpieces that achieve extremity in either **Logos (Reason)** or **Pathos (Emotion)**.
 
-It utilizes a **Hybrid Architecture** combining Gemini 2.0 Pro's internal knowledge base with real-time Google Search grounding, orchestrated by the custom **ABBF (Adaptive Bayesian-Bandwagon Filtering)** algorithm to detect and mitigate review bombing or controversial bias.
+It utilizes a **Hybrid Architecture** combining Gemini 3.0 Pro's internal knowledge base with real-time Google Search grounding, orchestrated by the custom **ABBF (Adaptive Bayesian-Bandwagon Filtering)** algorithm to detect and mitigate review bombing or controversial bias.
 
 ---
 
@@ -89,7 +89,7 @@ The prompt architecture is split into two distinct stages to ensure data purity.
 
 * **Frontend**: React 19, TypeScript, Tailwind CSS
 * **UI Components**: Lucide React, Recharts
-* **AI Backend**: Google Gemini API (Gemini 2.0 Pro Preview)
+* **AI Backend**: Google Gemini API (Gemini 3.0 Pro Preview)
 * **Build Tool**: Vite
 
 ---
