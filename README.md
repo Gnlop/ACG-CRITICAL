@@ -95,14 +95,8 @@ This is the core risk-control engine designed to handle **polarized masterpieces
 
   <p>
     X-Critical always works in a 6-dimensional space:
-  </p>
-
-  <pre><code>\[
-\mathbf{s} = (E, A, C, O, U, R) \in [0, 5]^6
-\]</code></pre>
-
-  <p>
-    with <strong>0.5 step</strong> constraints on each dimension.
+    <code>(E, A, C, O, U, R)</code> where each dimension is in <code>[0.0, 5.0]</code>
+    with a step of <code>0.5</code>.
   </p>
 
   <ul>
@@ -114,169 +108,100 @@ This is the core risk-control engine designed to handle **polarized masterpieces
     <li><strong>R</strong> – Resonance / 残响</li>
   </ul>
 
-  <p>
-    Types are defined in <a href="./types.ts"><code>types.ts</code></a>:
-  </p>
-
-  <pre><code>export interface Scores {
-  E: number;
-  A: number;
-  C: number;
-  O: number;
-  U: number;
-  R: number;
-}
-
-export interface Indices {
-  P: number;
-  D: number;
-  OI: number;
-  CI: number;
-  RI: number;
-  S: number;
-  S_adj: number; // 0–100
-}</code></pre>
-
-  <p>The main response object is:</p>
-
-  <pre><code>export interface ReviewResult {
-  verdict: 'IN' | 'OUT';
-  verdict_basis: 'A' | 'B' | 'C' | null;
-  title_localized: LocalizedTitle;
-  scores: Scores;        // final, ABBF-blended scores
-  scores_local?: Scores; // phase 1 (local) scores
-  scores_online?: Scores;// phase 2 (online) scores
-  indices: Indices;      // including S and S_adj
-  // ...
-  coefficients: Coefficients;
-  source_analysis: SourceAnalysis;
-}</code></pre>
-
-  <hr />
-
   <h3>1. Base weights &amp; composite score</h3>
 
-  <p>
-    All 6 dimensions share a <strong>fixed weight vector</strong> 
-    (<code>constants.ts</code> → “B.6 基础权重优化”):
-  </p>
-
-  <pre><code>\[
-\mathbf{w} =
-(w_E, w_A, w_C, w_O, w_U, w_R)
-= (0.25, 0.25, 0.20, 0.15, 0.10, 0.05)
-\]</code></pre>
+  <p>All 6 dimensions share a fixed weight vector (from <code>constants.ts</code>):</p>
 
   <p>
-    Given any score vector 
-    <code>\(\mathbf{s} = (E, A, C, O, U, R)\)</code>, 
-    the <strong>raw weighted score</strong> <code>S</code> is:
+    <code>
+      w = (w_E, w_A, w_C, w_O, w_U, w_R)
+      = (0.25, 0.25, 0.20, 0.15, 0.10, 0.05)
+    </code>
   </p>
-
-  <pre><code>\[
-S = w_E E + w_A A + w_C C + w_O O + w_U U + w_R R
-\quad \in [0, 5]
-\]</code></pre>
 
   <p>
-    In JSON, the <code>indices</code> field stores both the raw value and the 0–100 variant:
+    Given any score vector <code>s = (E, A, C, O, U, R)</code>, the raw weighted
+    composite score <code>S</code> is:
   </p>
+
+  <p>
+    <code>
+      S = 0.25 * E + 0.25 * A + 0.20 * C + 0.15 * O + 0.10 * U + 0.05 * R
+    </code>
+  </p>
+
+  <p>In JSON, the indices field stores:</p>
 
   <ul>
     <li><code>indices.S</code> – raw weighted score in <code>[0.0, 5.0]</code></li>
     <li><code>indices.S_adj</code> – adjusted score in <code>[0.0, 100.0]</code></li>
   </ul>
 
-  <p>
-    The mapping is linear (<code>constants.ts</code> → “B.7 指数计算标准”):
-  </p>
+  <p>The mapping is linear:</p>
 
-  <pre><code>\[
-S_{\text{adj}} = S \times 20
-\]</code></pre>
+  <p><code>S_adj = S * 20</code></p>
 
   <blockquote>
     <p>
-      Constraint: <strong>X-Critical never exposes 0–5 scores as a “global rating”</strong> – 
-      only <code>S_adj</code> (0–100) is used for UI and exports. The 0–5 values are internal
-      building blocks.
+      X-Critical never exposes the 0–5 score as a “global rating”. Only
+      <code>S_adj</code> (0–100) is used for UI and exports; the 0–5 values are
+      internal building blocks.
     </p>
   </blockquote>
 
-  <hr />
-
-  <h3>2. Extreme thresholds (A/B/C classes)</h3>
+  <h3>2. Extreme thresholds (A / B / C classes)</h3>
 
   <p>
-    X-Critical is <strong>not</strong> a generic 0–100 recommender.
-    A work must first pass at least one <strong>extreme threshold</strong> (“A.5 极致阈值”) 
-    to even be eligible for <strong>IN</strong>:
+    A work must pass at least one extreme threshold to be eligible for
+    <strong>IN</strong>.
   </p>
 
-  <ol>
-    <li>
-      <p><strong>Class A – Logos extreme (理性极致)</strong></p>
-      <pre><code>\[
-E \ge 4.5,\quad
-U \ge 4.0,\quad
-O \ge 4.0 \ \text{(or strongly justified reinterpretation)}
-\]</code></pre>
-    </li>
-
-    <li>
-      <p><strong>Class B – Pathos / flavor extreme (情感 / 风味极致)</strong></p>
-
-      <p>Main route:</p>
-      <pre><code>\[
-A \ge 4.5,\quad
-U \ge 4.0,\quad
-O \ge 4.0 \ \text{(or strongly justified)}
-\]</code></pre>
-
-      <p>Flavor route (<strong>B’</strong>):</p>
-      <pre><code>\[
-R \ge 4.5,\quad
-U \ge 4.0,\quad
-(C \ge 4.5 \ \text{or}\ A \ge 4.0),\quad
-O \ge 3.5 \ \text{(or stable mechanism)}
-\]</code></pre>
-    </li>
-
-    <li>
-      <p><strong>Class C – Dual peak (双巅峰)</strong></p>
-      <pre><code>\[
-E \ge 4.0,\quad
-A \ge 4.0,\quad
-C \ge 4.5,\quad
-U \ge 4.2
-\]</code></pre>
-    </li>
-  </ol>
-
-  <p><strong>Rule of thumb:</strong></p>
+  <h4>Class A – Logos extreme (理性极致)</h4>
 
   <ul>
-    <li>
-      If the final scores (after ABBF, see below) satisfy <strong>A / B / C</strong> → 
-      <code>verdict_basis</code> is set accordingly and the work <em>may</em> become <strong>IN</strong>.
-    </li>
-    <li>
-      If the work fails <strong>all three</strong>, it is automatically <strong>OUT</strong>, 
-      no matter how “ok” the average looks.
-    </li>
+    <li><code>E &gt;= 4.5</code></li>
+    <li><code>U &gt;= 4.0</code></li>
+    <li><code>O &gt;= 4.0</code> (or a strongly justified reinterpretation)</li>
+  </ul>
+
+  <h4>Class B – Pathos / flavor extreme (情感 / 风味极致)</h4>
+
+  <p>Main route:</p>
+  <ul>
+    <li><code>A &gt;= 4.5</code></li>
+    <li><code>U &gt;= 4.0</code></li>
+    <li><code>O &gt;= 4.0</code> (or strongly justified)</li>
+  </ul>
+
+  <p>Flavor route (B'):</p>
+  <ul>
+    <li><code>R &gt;= 4.5</code></li>
+    <li><code>U &gt;= 4.0</code></li>
+    <li><code>C &gt;= 4.5</code> or <code>A &gt;= 4.0</code></li>
+    <li><code>O &gt;= 3.5</code> (or a stable mechanism)</li>
+  </ul>
+
+  <h4>Class C – Dual peak (双巅峰)</h4>
+
+  <ul>
+    <li><code>E &gt;= 4.0</code></li>
+    <li><code>A &gt;= 4.0</code></li>
+    <li><code>C &gt;= 4.5</code></li>
+    <li><code>U &gt;= 4.2</code></li>
   </ul>
 
   <p>
-    This is how X-Critical “kills lukewarm works” and only keeps genuinely <strong>extreme</strong> ones.
+    If final scores (after ABBF) satisfy any of A/B/C, <code>verdict_basis</code>
+    is set accordingly and the work may become <strong>IN</strong>. If a work
+    fails all three, it is forced <strong>OUT</strong> even if the average
+    looks “fine”.
   </p>
-
-  <hr />
 
   <h3>3. Phase 1 – Local analysis (isolation mode)</h3>
 
   <p>
-    <strong>Goal:</strong> Let Gemini judge the work <strong>in isolation</strong>, using only its internal
-    knowledge and semantics. No searching, no ABBF, no “what the internet thinks”.
+    Gemini judges the work in isolation, using only its internal knowledge.
+    No searching, no ABBF, no external opinions.
   </p>
 
   <p>Conceptually:</p>
@@ -286,7 +211,7 @@ scores_local: Scores;  // (E_loc, A_loc, C_loc, O_loc, U_loc, R_loc)
 indices.S: number;     // weighted S from scores_local
 indices.S_adj: number; // S * 20
 source_analysis: {
-  local_confidence: number;   // ~ how solid the internal knowledge is
+  local_confidence: number;   // how solid the internal knowledge is
   online_confidence: 0;       // not used yet
   blending_coefficient: 0;    // Omega not applied yet
   consensus_reliability: 'Low';
@@ -294,39 +219,25 @@ source_analysis: {
   moral_controversy_factor: 0;
 }</code></pre>
 
-  <p>Mathematically, for phase 1:</p>
-
-  <pre><code>\[
-\mathbf{s}_{\text{local}} = (E_{loc}, A_{loc}, C_{loc}, O_{loc}, U_{loc}, R_{loc})
-\]
-
-\[
-S_{\text{local}} = \sum_d w_d \, d_{loc}, \quad
-S_{\text{local,adj}} = 20 \cdot S_{\text{local}}
-\]</code></pre>
-
   <p>
-    At this stage, the UI can already show a <strong>Local Model</strong> card labeled as 
-    <code>MODE: LOCAL</code>.
+    At this stage, the UI shows the <strong>Local Model</strong> card
+    (<code>MODE: LOCAL</code>) and uses only <code>scores_local</code> to compute
+    <code>indices.S</code> and <code>S_adj</code>.
   </p>
-
-  <hr />
 
   <h3>4. Phase 2 – Online analysis (network mode)</h3>
 
   <p>
-    Phase 2 unlocks tools and makes Gemini:
+    The second phase unlocks tools and lets Gemini:
   </p>
 
   <ul>
-    <li>search for reviews / wikis / discussions</li>
-    <li>estimate opinion distribution &amp; polarization</li>
-    <li>detect possible <strong>review bombing / taboo bias</strong></li>
+    <li>search for reviews / wikis / discussions,</li>
+    <li>estimate opinion distributions and polarization,</li>
+    <li>detect possible review bombing or moral panic.</li>
   </ul>
 
-  <p>
-    The output is a second 6-D vector plus meta-signals:
-  </p>
+  <p>Output:</p>
 
   <pre><code>scores_online: Scores;  // (E_net, A_net, C_net, O_net, U_net, R_net)
 
@@ -342,189 +253,125 @@ source_analysis: SourceAnalysis = {
 }</code></pre>
 
   <p>
-    The <strong>network composite</strong> is computed with the same weights:
+    A network composite score <code>S_net</code> is computed from
+    <code>scores_online</code> using the same weights, and internally mapped to
+    <code>S_net_adj = S_net * 20</code>. These are input to ABBF and are not
+    exposed as a final rating.
   </p>
-
-  <pre><code>\[
-\mathbf{s}_{\text{net}} = (E_{net}, A_{net}, C_{net}, O_{net}, U_{net}, R_{net})
-\]
-
-\[
-S_{\text{net}} = \sum_d w_d \, d_{net}, \quad
-S_{\text{net,adj}} = 20 \cdot S_{\text{net}}
-\]</code></pre>
-
-  <p>
-    These are used only as an <strong>input</strong> to the ABBF engine; they are never exposed as a standalone
-    “final rating”.
-  </p>
-
-  <hr />
 
   <h3>5. ABBF (Adaptive Bayesian-Bandwagon Filtering)</h3>
 
   <p>
-    ABBF is the core of the hybrid mode: it decides <strong>how much to trust the crowd</strong> vs. the local model.
+    ABBF decides how much to trust the crowd vs. the local model.
   </p>
 
   <h4>5.1 Base Omega from consensus reliability</h4>
 
-  <p>
-    From <code>consensus_reliability</code> (“High / Medium / Low”):
-  </p>
+  <p>From <code>consensus_reliability</code>:</p>
 
-  <pre><code>High   → ω_base = 0.8   // strong consensus, trust the network more
-Medium → ω_base = 0.6
-Low    → ω_base = 0.3   // highly polarizing, fall back to local</code></pre>
-
-  <p>
-    (these values come directly from <code>constants.ts</code> → “B.8 自适应贝叶斯-跟风过滤算法”)
-  </p>
+  <ul>
+    <li><code>High   → omega_base = 0.8</code> (strong consensus, trust network more)</li>
+    <li><code>Medium → omega_base = 0.6</code></li>
+    <li><code>Low    → omega_base = 0.3</code> (highly polarizing, fall back to local)</li>
+  </ul>
 
   <h4>5.2 Taboo Tax (bandwagon / moral penalty)</h4>
 
   <p>
-    When the local model sees a strong core but the network score is low <strong>because of topic taboos</strong>,
-    ABBF switches into a protective mode (“Taboo Tax”):
+    If the local model gives high E/A but the network gives low E/A because
+    of sensitive themes (ethics, violence, politics, etc.), ABBF enters a
+    "Taboo Tax" mode:
   </p>
-
-  <p>If:</p>
-
-  <ul>
-    <li><code>Score_Local(A or E) &gt; 4.0</code> <strong>and</strong></li>
-    <li><code>Score_Online(A or E) &lt; 3.0</code> <strong>and</strong></li>
-    <li>
-      the work contains <strong>sensitive themes</strong> (ethics, violence, politics, etc.),
-    </li>
-  </ul>
-
-  <p>then:</p>
 
   <ul>
     <li><code>bandwagon_penalty_detected = true</code></li>
     <li><code>moral_controversy_factor</code> is raised</li>
     <li>
-      for <strong>subjective dimensions</strong> (E, A, R) we force:
-      <pre><code>\[
-\omega_{\text{subj}} = 0.1
-\]</code></pre>
-      <p>
-        “Almost ignore the network on Logos / Pathos / Resonance; trust the internal reading of the text.”
-      </p>
+      for subjective dimensions (E, A, R) we reduce omega and may force
+      <code>omega_subj ≈ 0.1</code>:
+      “almost ignore the network on Logos / Pathos / Resonance”.
     </li>
     <li>
-      <strong>Objective dimensions</strong> (C, U) keep the original 
-      <code>\(\omega_{base}\)</code>. Bad art or pacing is still a valid criticism even for masterpieces.
+      objective dimensions (C, U) keep <code>omega_base</code>, because craft
+      and pacing criticism is still valid even for masterpieces.
     </li>
   </ul>
 
   <h4>5.3 Final per-dimension Omega</h4>
 
   <p>
-    For each dimension <code>d ∈ {E, A, C, O, U, R}</code>, the engine computes:
+    For each dimension <code>d</code> in <code>{E, A, C, O, U, R}</code>,
+    ABBF computes:
   </p>
 
-  <pre><code>\[
-\omega_d = \mathrm{Clamp}(
-  \omega_{base} + \text{AgeFactor} - \text{ControversyPenalty},
-  0.1,\ 0.9
-)
-\]</code></pre>
-
-  <ul>
-    <li>
-      AgeFactor / ControversyPenalty are derived from the hybrid analysis prompt
-      (age of the work, stability of reputation, <code>moral_controversy_factor</code>, etc.).
-    </li>
-    <li>Subjective dims (E/A/R) are pushed <strong>down</strong> when taboo effects are detected.</li>
-    <li>Objective dims (C/U) are allowed to stay <strong>high</strong> if the craft is broadly agreed upon.</li>
-  </ul>
+  <p>
+    <code>
+      omega_d = Clamp(omega_base + AgeFactor - ControversyPenalty, 0.1, 0.9)
+    </code>
+  </p>
 
   <p>
-    The <strong>global</strong> <code>blending_coefficient</code> displayed in the UI is a summary of these 
-    <code>\(\omega_d\)</code> values.
+    AgeFactor and ControversyPenalty come from the hybrid analysis prompt
+    (work age, stability of reputation, moral_controversy_factor, etc.).
+  </p>
+
+  <p>
+    Subjective dims (E/A/R) tend to get lower omega when taboo effects are detected;
+    objective dims (C/U) can keep relatively high omega if craft is broadly agreed upon.
+  </p>
+
+  <p>
+    The global <code>blending_coefficient</code> in the UI is an aggregated summary
+    of all <code>omega_d</code>.
   </p>
 
   <h4>5.4 Final blended scores</h4>
 
   <p>For each dimension:</p>
 
-  <pre><code>\[
-d_{\text{final}} =
-(1 - \omega_d) \cdot d_{\text{local}}
-+ \omega_d \cdot d_{\text{net}}
-\]</code></pre>
+  <p>
+    <code>
+      d_final = (1 - omega_d) * d_local + omega_d * d_net
+    </code>
+  </p>
 
-  <p>Collecting them:</p>
+  <p>
+    The final score vector is:
+    <code>(E_fin, A_fin, C_fin, O_fin, U_fin, R_fin)</code>.
+  </p>
 
-  <pre><code>\[
-\mathbf{s}_{\text{final}} =
-(E_{fin}, A_{fin}, C_{fin}, O_{fin}, U_{fin}, R_{fin})
-\]
+  <p>
+    The final composite score is computed from these final scores using the same
+    weights, then mapped to <code>S_final_adj = S_final * 20</code>.
+  </p>
 
-\[
-S_{\text{final}} = \sum_d w_d \, d_{fin}, \quad
-S_{\text{final,adj}} = 20 \cdot S_{\text{final}}
-\]</code></pre>
+  <p>In JSON:</p>
 
-  <p>In the final JSON:</p>
+  <pre><code>scores        // final, blended scores
+scores_local  // Phase 1 snapshot
+scores_online // Phase 2 snapshot
 
-  <pre><code>scores        // = s_final (what the UI shows as main 6-dim scores)
-scores_local  // = s_local  (Phase 1 snapshot)
-scores_online // = s_net    (Phase 2 snapshot)
-
-indices.S     // = S_final
-indices.S_adj // = S_final * 20</code></pre>
-
-  <hr />
+indices.S     // S_final, 0–5
+indices.S_adj // S_final * 20, 0–100</code></pre>
 
   <h3>6. Final IN / OUT decision</h3>
 
-  <p><strong>Putting it all together:</strong></p>
-
   <ol>
+    <li>Compute <code>scores_local</code> and <code>S / S_adj</code> from phase 1.</li>
+    <li>Compute <code>scores_online</code> and <code>SourceAnalysis</code> from phase 2.</li>
+    <li>Run ABBF to get final <code>scores</code> and updated <code>S / S_adj</code>.</li>
     <li>
-      <strong>Compute</strong> <code>scores_local</code> and 
-      <code>indices.S/S_adj</code> from phase 1.
-    </li>
-    <li>
-      <strong>Compute</strong> <code>scores_online</code> + 
-      <code>SourceAnalysis</code> from phase 2.
-    </li>
-    <li>
-      <strong>Run ABBF</strong> to get <code>scores</code> (final) + updated 
-      <code>indices.S/S_adj</code>.
-    </li>
-    <li>
-      <strong>Check extreme thresholds</strong> (A/B/C) using the 
-      <strong>final scores</strong>:
+      Check A / B / C extreme thresholds using the final scores:
       <ul>
-        <li>
-          If any of A / B / C is satisfied → candidate <strong>IN</strong>.
-          <ul>
-            <li><code>verdict_basis = 'A' | 'B' | 'C'</code> accordingly.</li>
-          </ul>
-        </li>
-        <li>
-          Otherwise → forced <strong>OUT</strong> (<code>verdict = 'OUT'</code>).
-        </li>
+        <li>If any class is satisfied → candidate <strong>IN</strong>, with <code>verdict_basis</code> set to 'A' / 'B' / 'C'.</li>
+        <li>Otherwise → forced <strong>OUT</strong>.</li>
       </ul>
     </li>
     <li>
-      The UI then renders:
-      <ul>
-        <li>a verdict badge (<strong>IN / OUT</strong>),</li>
-        <li>the basis (<strong>A / B / C class</strong>),</li>
-        <li>a radar chart for local / online / final scores,</li>
-        <li>
-          and a <strong>Source Weighting</strong> box using <code>SourceAnalysis</code>
-          (local vs online confidence, consensus level, taboo flags, etc.).
-        </li>
-      </ul>
+      The UI then renders: verdict badge (IN/OUT), basis class, radar chart
+      (local/online/final) and source weighting based on <code>SourceAnalysis</code>.
     </li>
   </ol>
-
-  <p>In short:</p>
 
   <blockquote>
     <p><strong>Local</strong> = “how good the work really is, text-in-itself”.<br />
@@ -534,6 +381,7 @@ indices.S_adj // = S_final * 20</code></pre>
   </blockquote>
 
 </div>
+
 
 #### ⚖️ Dynamic Weighting
 * **Objective Metrics (C/U)**: Heavily weighted towards **Online Consensus** (masses rarely lie about animation quality).
