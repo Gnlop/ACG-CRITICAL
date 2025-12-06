@@ -120,11 +120,9 @@ The prompt architecture is split into two distinct stages to ensure data purity.
 
 ---
 
-# Run and deploy your AI Studio app
+# Run in AI Studio app
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1aeP_3AwuxSLZ50LN4lU3J3oWht95j3rJ
+View  in AI Studio: [https://ai.studio/apps/drive/1aeP_3AwuxSLZ50LN4lU3J3oWht95j3rJ](https://ai.studio/apps/drive/1aeP_3AwuxSLZ50LN4lU3J3oWht95j3rJ)
 
 ---
 
