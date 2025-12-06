@@ -29,11 +29,29 @@ Unlike traditional review aggregators that average user scores, X-Critical emplo
 
 It utilizes a **Hybrid Architecture** combining Gemini 3.0 Pro's internal knowledge base with real-time Google Search grounding, orchestrated by the custom **ABBF (Adaptive Bayesian-Bandwagon Filtering)** algorithm to detect and mitigate review bombing or controversial bias.
 
+> 🌐 **Global Accessibility**: The frontend engine delivers native, culturally-nuanced output in **English, Chinese (Simplified), and Japanese**, ensuring critical analysis bridges language barriers.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Lang-English-blue?style=flat-square&logo=google-translate&logoColor=white">
+  <img src="https://img.shields.io/badge/Lang-中文-red?style=flat-square&logo=google-translate&logoColor=white">
+  <img src="https://img.shields.io/badge/Lang-日本語-white?style=flat-square&logo=google-translate&logoColor=black">
+</p>
+
 <br/>
 <div align="center">
-  <h3>📊 Analysis Demo</h3>
-  <img src="https://github.com/Gnlop/ACG-CRITICAL/raw/main/X-Critical-Nukitashi_the_Animation.jpg" alt="X-Critical Interface Demo" width="90%" style="border-radius: 10px; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);" />
-  <p><em>Figure 1: Real-time analysis of "Nukitashi the Animation" showcasing the 6-Dimensional Metric.</em></p>
+  <h2>📸 Workflow Showcase</h2>
+  
+  <h3>1. Start / Search</h3>
+  <img src="https://github.com/Gnlop/ACG-CRITICAL/raw/main/start.png" alt="Start Screen" width="90%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+
+  <br/><br/>
+  <p style="font-size: 1.5rem;">⬇️ <i>ABBF Algorithm Processing...</i> ⬇️</p>
+  <br/>
+
+  <h3>2. Critical Analysis Result</h3>
+  <img src="https://github.com/Gnlop/ACG-CRITICAL/raw/main/X-Critical-Nukitashi_the_Animation.jpg" alt="Analysis Result" width="45%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" />
+  
+  <p><em>Figure 1: From search query to detailed 6-dimensional report.</em></p>
 </div>
 <br/>
 
