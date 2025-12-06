@@ -135,8 +135,8 @@ View  in AI Studio: [https://ai.studio/apps/drive/1aeP_3AwuxSLZ50LN4lU3J3oWht95j
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/yourusername/x-critical.git](https://github.com/yourusername/x-critical.git)
-    cd x-critical
+    git clone [https://github.com/Gnlop/ACG-CRITICAL.git](https://github.com/Gnlop/ACG-CRITICAL.git)
+    cd ACG-CRITICAL
     ```
 
 2.  **Install dependencies**
@@ -149,7 +149,6 @@ View  in AI Studio: [https://ai.studio/apps/drive/1aeP_3AwuxSLZ50LN4lU3J3oWht95j
     ```env
     VITE_GEMINI_API_KEY=your_gemini_api_key_here
     ```
-    *(Note: Ensure your env variable matches the implementation in your code, usually prefixed with VITE_ for Vite projects)*
 
 4.  **Run the app**
     ```bash
